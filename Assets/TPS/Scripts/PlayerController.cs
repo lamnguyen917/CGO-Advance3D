@@ -28,7 +28,7 @@ public class PlayerController : MonoBehaviour
         var moveDirection = transform.TransformDirection(movement) * moveSpeed * Time.deltaTime;
         moveDirection.y += Physics.gravity.y * moveSpeed * Time.deltaTime;
         characterController.Move(moveDirection);
-        RunLook(movement);
+        // RunLook(movement);
 
         // if (movement.magnitude > 0)
         // {
@@ -55,7 +55,7 @@ public class PlayerController : MonoBehaviour
         transform.LookAt(pos);
     }
 
-    public void RunLook(Vector3 direction)
+    private void RunLook(Vector3 direction)
     {
         if (direction.magnitude < 0.25) return;
         direction = Quaternion.Euler(0, 0 + transform.eulerAngles.y, 0) * direction;
