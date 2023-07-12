@@ -1,11 +1,20 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance;
+
     [SerializeField] private GameObject crosshair;
     [SerializeField] private LayerMask floorMask;
+    public PlayerController player;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
@@ -17,20 +26,18 @@ public class GameManager : MonoBehaviour
         if (Input.GetMouseButton(0))
         {
             var mousePosition = Input.mousePosition;
-            mousePosition.z = 10;
-            var pos = Camera.main.ScreenToWorldPoint(mousePosition);
-            crosshair.transform.position = pos;
-            // Debug.DrawRay(ray.origin, ray.direction * 1000, Color.green);
-            // GameObject floor;
-            // // var hit = Physics.Raycast(ray, out floor, floorMask);
-            // if (Physics.Raycast(ray, out RaycastHit hit, floorMask))
-            // {
-            //     Debug.Log(hit.transform.name);
-            //     if (hit.transform.CompareTag("Floor"))
-            //     {
-            //         crosshair.transform.position = hit.transform.position;
-            //     }
-            // }
+            // mousePosition.z = 10;
+            var ray = Camera.main.ScreenPointToRay(mousePosition);
+            Debug.DrawRay(ray.origin, ray.direction * 1000, Color.green);
+            if (Physics.Raycast(ray, out RaycastHit hit, floorMask))
+            {
+                if (hit.transform.CompareTag("Floor"))
+                {
+                    var pos = hit.point;
+                    pos.y += 0.001f;
+                    crosshair.transform.position = hit.point;
+                }
+            }
         }
     }
 }
