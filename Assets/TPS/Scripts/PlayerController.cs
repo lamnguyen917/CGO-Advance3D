@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
@@ -15,6 +16,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform weaponLeft;
     [SerializeField] private Transform weaponRight;
 
+    [SerializeField] private Transform leftFoot;
+    [SerializeField] private Transform rightFoot;
+    [SerializeField] private float maxHitDistance = 1;
+    [SerializeField] private MeshFilter meshFilter;
+
     void Start()
     {
     }
@@ -22,6 +28,17 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            var mesh = meshFilter.mesh;
+            // Debug.Log(mesh.vertices);
+            // Debug.Log(mesh.triangles);
+            foreach (var vert in mesh.normals)
+            {
+                Debug.Log(vert);
+            }
+        }
+
         var v = Input.GetAxis("Vertical");
         var h = Input.GetAxis("Horizontal");
         Vector3 movement = new Vector3(h, 0, v);
@@ -63,5 +80,51 @@ public class PlayerController : MonoBehaviour
         playerTransform.rotation =
             Quaternion.Lerp(playerTransform.rotation, Quaternion.LookRotation(direction), Time.deltaTime);
         playerTransform.localEulerAngles = new Vector3(0, playerTransform.localEulerAngles.y, 0);
+    }
+
+    private void OnAnimatorIK(int layerIndex)
+    {
+        if (animator == null) return;
+        // animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1);
+        // animator.SetIKPosition(AvatarIKGoal.LeftFoot, leftFoot.position);
+
+        // Debug.DrawRay(leftFoot.position + leftFootOffset, Vector3.down * 100, Color.red);
+        Ray leftRay = new Ray(leftFoot.position + Vector3.up, Vector3.down);
+        if (Physics.Raycast(leftRay, out RaycastHit leftHit, maxHitDistance))
+        {
+            animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1);
+            animator.SetIKPosition(AvatarIKGoal.LeftFoot, leftHit.point);
+
+            animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, 1);
+            Vector3 rotAxis = Vector3.Cross(Vector3.up, leftHit.normal);
+            float angle = Vector3.Angle(Vector3.up, leftHit.normal);
+            Quaternion rot = Quaternion.AngleAxis(angle, rotAxis);
+
+            animator.SetIKRotation(AvatarIKGoal.LeftFoot, rot);
+        }
+        else
+        {
+            animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 0);
+            animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, 0);
+        }
+
+        Ray rightRay = new Ray(rightFoot.position + Vector3.up, Vector3.down);
+        if (Physics.Raycast(rightRay, out RaycastHit rightHit, maxHitDistance))
+        {
+            animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1);
+            animator.SetIKPosition(AvatarIKGoal.RightFoot, rightHit.point);
+
+            animator.SetIKRotationWeight(AvatarIKGoal.RightFoot, 1);
+            Vector3 rotAxis = Vector3.Cross(Vector3.up, rightHit.normal);
+            float angle = Vector3.Angle(Vector3.up, rightHit.normal);
+            Quaternion rot = Quaternion.AngleAxis(angle, rotAxis);
+
+            animator.SetIKRotation(AvatarIKGoal.RightFoot, rot);
+        }
+        else
+        {
+            animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 0);
+            animator.SetIKRotationWeight(AvatarIKGoal.RightFoot, 0);
+        }
     }
 }

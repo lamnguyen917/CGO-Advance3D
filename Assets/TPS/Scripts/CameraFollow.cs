@@ -4,17 +4,17 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    public Transform target; // Transform của nhân vật cần theo dõi
-    public Vector3 offset = new (0f, 5f, -10f); // Vị trí tương đối của camera so với nhân vật
-    public float smoothSpeed = 0.125f; // Tốc độ di chuyển của camera
+    public Transform target;
+    public Vector3 offset = new(0f, 5f, -10f);
+    public float smoothSpeed = 0.125f;
 
     private void LateUpdate()
     {
-        Vector3 desiredPosition = target.position + offset; // Vị trí mà camera muốn đến
-        Vector3 smoothedPosition =
-            Vector3.Lerp(transform.position, desiredPosition, smoothSpeed); // Vị trí mới của camera được làm mượt
+        Vector3 desiredPosition = target.position + offset;
+        // Vector3 smoothedPosition =
+        //     Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
 
-        transform.position = smoothedPosition; // Cập nhật vị trí của camera
-        transform.LookAt(target); // Camera luôn nhìn về nhân vật
+        transform.position = desiredPosition;
+        transform.LookAt(target);
     }
 }
